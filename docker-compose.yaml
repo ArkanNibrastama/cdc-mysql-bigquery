@@ -1,0 +1,2 @@
+# make a container of the required tools
+version: '3.7'
