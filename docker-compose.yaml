@@ -2,7 +2,7 @@
 version: "3.7"
 services:
   mysql:
-    image: "debezium/example-mysql:2.3"
+    image: debezium/example-mysql:1.4
     ports:
       - 3306:3306
     environment:
@@ -28,6 +28,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+
 
   debezium:
     image: debezium/connect:1.4
