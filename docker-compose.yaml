@@ -2,7 +2,8 @@
 version: "3.7"
 services:
   mysql:
-    image: debezium/example-mysql:1.4
+    image: quay.io/debezium/example-mysql:2.3
+    container_name: mysql
     ports:
       - 3306:3306
     environment:
@@ -11,59 +12,38 @@ services:
       - MYSQL_PASSWORD=user123
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:5.5.3
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
+    image: quay.io/debezium/zookeeper:2.3
+    container_name: zookeeper
+    ports:
+      - 2181:2181
 
   kafka:
-    image: confluentinc/cp-enterprise-kafka:5.5.3
-    depends_on:
-      - zookeeper
-
+    image: quay.io/debezium/kafka:2.3
+    container_name: kafka
     ports:
       - 29092:29092
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-
+      ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    depends_on:
+      - zookeeper
 
   debezium:
-    image: debezium/connect:1.4
-    environment:
-      BOOTSTRAP_SERVERS: kafka:9092
-      GROUP_ID: 1
-      CONFIG_STORAGE_TOPIC: connect_configs
-      OFFSET_STORAGE_TOPIC: connect_offsets
-      KEY_CONVERTER: io.confluent.connect.avro.AvroConverter
-      VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
-      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
-    depends_on: [kafka]
+    image: quay.io/debezium/connect:2.3
+    container_name: debezium
     ports:
       - 8083:8083
 
-  schema-registry:
-    image: confluentinc/cp-schema-registry:5.5.3
     environment:
-      - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=zookeeper:2181
-      - SCHEMA_REGISTRY_HOST_NAME=schema-registry
-      - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081,http://localhost:8081
-    ports:
-      - 8081:8081
-    depends_on: [zookeeper, kafka]
-  
-  kafka_manager:
-    image: hlebalbau/kafka-manager:stable
-    restart: always
-    ports:
-      - "9000:9000"
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: my_connect_configs
+      OFFSET_STORAGE_TOPIC: my_connect_offsets
+      STATUS_STORAGE_TOPIC: my_connect_statuses
+
     depends_on:
-      - zookeeper
       - kafka
-    environment:
-      ZK_HOSTS: "zookeeper:2181"
-      APPLICATION_SECRET: "random-secret"
-    command: -Dpidfile.path=/dev/null 
+      - mysql
