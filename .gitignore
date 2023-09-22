@@ -1,2 +1,4 @@
 cdc_venv
 *__pycache__
+*.env
+*credentials.json
