@@ -11,10 +11,11 @@ models.Base.metadata.create_all(bind=engine)
 # data validation (input schema)
 class OrderBase(BaseModel):
     # don't input the order_id becuse it's auto increment
-    user_id: int
-    seller_id: int
-    product_id: int
+    customer_id: int
+    product_category_id: int
     order_date: str
+    origin_office: str
+    destination_office: str
     order_status: str
 
 class UpdateStatusBase(BaseModel):
