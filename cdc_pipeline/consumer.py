@@ -37,9 +37,8 @@ for m in consumer:
         # insert the new data
         data = {
             'order_id': data_changes['order_id'],
-            'user_id': data_changes['user_id'],
-            'seller_id': data_changes['seller_id'],
-            'product_id': data_changes['product_id'],
+            'customer_id': data_changes['customer_id'],
+            'product_category_id': data_changes['product_category_id'],
             'origin_office' : data_changes['origin_office'],
             'destination_office' : data_changes['destination_office'],
             'order_status': data_changes['order_status'],

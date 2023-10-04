@@ -12,9 +12,8 @@ class BigQuery():
         query = f'''
             CREATE TABLE IF NOT EXISTS {table_name} (
                 order_id INTEGER,
-                user_id INTEGER,
-                seller_id INTEGER,
-                product_id INTEGER,
+                customer_id INTEGER,
+                product_category_id INTEGER,
                 origin_office STRING(30),
                 destination_office STRING(30),
                 order_status STRING(25),
@@ -60,9 +59,8 @@ class BigQuery():
         query = f'''
             INSERT INTO `{table_name}` VALUES (
                 {data['order_id']}, 
-                {data['user_id']}, 
-                {data['seller_id']}, 
-                {data['product_id']},
+                {data['customer_id']}, 
+                {data['product_category_id']},
                 '{data['origin_office']}', 
                 '{data['destination_office']}',  
                 '{data['order_status']}', 
