@@ -4,11 +4,11 @@ from sendToBQ import BigQuery
 from datetime import datetime
 
 # initialize BQ connection
-bq = BigQuery()
-bq_table_name = 'expedition_order.order'
+bq_table_name = 'expedition.order'
+bq = BigQuery(table_name=bq_table_name)
 
 # initialize consumer
-topicName = 'dbserver1.expedition.order'
+topicName = 'source.expedition.order'
 bootstrap_servers = ['localhost:29092']
 consumer = KafkaConsumer (
                 topicName , 
@@ -40,6 +40,8 @@ for m in consumer:
             'user_id': data_changes['user_id'],
             'seller_id': data_changes['seller_id'],
             'product_id': data_changes['product_id'],
+            'origin_office' : data_changes['origin_office'],
+            'destination_office' : data_changes['destination_office'],
             'order_status': data_changes['order_status'],
             'date_now': utc_now
         }

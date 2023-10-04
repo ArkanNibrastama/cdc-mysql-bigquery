@@ -5,8 +5,25 @@ os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = './credentials.json'
 
 class BigQuery():
 
-    def __init__(self) -> None:
+    def __init__(self, table_name) -> None:
         self.client = bigquery.Client()
+
+        # create table if not exist
+        query = f'''
+            CREATE TABLE IF NOT EXISTS {table_name} (
+                order_id INTEGER,
+                user_id INTEGER,
+                seller_id INTEGER,
+                product_id INTEGER,
+                origin_office STRING(30),
+                destination_office STRING(30),
+                order_status STRING(25),
+                start_date TIMESTAMP,
+                end_date TIMESTAMP,
+            )
+        '''
+        self.client.query(query=query).result()
+
 
     def isAvailable(self, order_id:int, table_name:str) -> bool:
 
@@ -45,7 +62,9 @@ class BigQuery():
                 {data['order_id']}, 
                 {data['user_id']}, 
                 {data['seller_id']}, 
-                {data['product_id']}, 
+                {data['product_id']},
+                '{data['origin_office']}', 
+                '{data['destination_office']}',  
                 '{data['order_status']}', 
                 '{data['date_now']}', 
                 NULL
